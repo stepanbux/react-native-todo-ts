@@ -6,7 +6,6 @@ const mainSlice = createSlice({
   initialState: {
     color: "#3949ab",
     todos: [],
-    email: "",
     id: "",
   },
   reducers: {
