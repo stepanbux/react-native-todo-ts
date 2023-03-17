@@ -16,14 +16,11 @@ const mainSlice = createSlice({
     setTodos(state, action) {
       state.todos = action.payload;
     },
-    deleteTodos(state, action) {
-      state.todos = action.payload;
-    },
     setUser(state, action) {
       state.id = action.payload;
     },
   },
 });
 
-export const { setColor, setTodos, deleteTodos, setUser } = mainSlice.actions;
+export const { setColor, setTodos, setUser } = mainSlice.actions;
 export default mainSlice.reducer;
