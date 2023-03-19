@@ -1,5 +1,5 @@
 import { signOut } from "firebase/auth";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Icon } from "react-native-elements";
 import { useAppSelector } from "../../store/redux-hooks";
@@ -36,16 +36,15 @@ const SettingsScreen = ({ navigation }: TabScreenProps) => {
     return { ...styles.logOut, borderColor: color };
   }, [color]);
 
-  const onPressLogOut = () => {
+  const onPressLogOut = useCallback(() => {
     signOut(auth)
       .then(() => {
-        console.log("succefull");
         navigation.navigate("SignIn");
       })
       .catch(() => {
         console.error();
       });
-  };
+  }, [navigation]);
   return (
     <View>
       <SettingItem title="Appearance" />

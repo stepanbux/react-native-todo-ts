@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-expressions */
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { StyleSheet, Text } from "react-native";
@@ -13,7 +12,7 @@ import { setNewTodos } from "../hooks/setNewTodos";
 const styles = StyleSheet.create({
   errorText: {
     position: "absolute",
-    left: "10%",
+    left: "11%",
     top: "26%",
     color: "red",
   },
@@ -23,41 +22,48 @@ const SignInScreen = ({ navigation }: SignInScreenProps) => {
   const [errorMessage, setErrorMessage] = useState("");
   const dispatch = useAppDispatch();
 
-  const pressSignIn = (email: string, password: string) => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then(async ({ user }) => {
-        dispatch(setUser(user.uid));
+  const hideErrorMessage = useCallback(() => {
+    setErrorMessage("");
+  }, []);
 
-        const docTodo = await getDoc(doc(db, "users", user.uid));
-        if (docTodo.exists()) {
-          const array: string[] = docTodo.data().todos;
-          const newArray = setNewTodos(array);
-          dispatch(setTodos(newArray));
-          dispatch(setColor(docTodo.data().color));
-        } else console.log("don't exist");
+  const pressSignIn = useCallback(
+    async (email: string, password: string) => {
+      await signInWithEmailAndPassword(auth, email, password)
+        .then(async ({ user }) => {
+          dispatch(setUser(user.uid));
 
-        setErrorMessage("");
-        navigation.navigate("Tab");
-      })
-      .catch((error) => {
-        switch (error.code) {
-          case "auth/wrong-password":
-            setErrorMessage("Wrong password");
-            break;
+          const docTodo = await getDoc(doc(db, "users", user.uid));
+          if (docTodo.exists()) {
+            const array: string[] = docTodo.data().todos;
+            const newArray = setNewTodos(array);
+            dispatch(setTodos(newArray));
+            dispatch(setColor(docTodo.data().color));
+          } else console.log("don't exist");
 
-          case "auth/invalid-email":
-            setErrorMessage("Invalid email");
-            break;
+          setErrorMessage("");
+          navigation.navigate("Tab");
+        })
+        .catch((error) => {
+          switch (error.code) {
+            case "auth/wrong-password":
+              setErrorMessage("Wrong password");
+              break;
 
-          case "auth/user-not-found":
-            setErrorMessage("User not found");
-            break;
+            case "auth/invalid-email":
+              setErrorMessage("Invalid email");
+              break;
 
-          default:
-            break;
-        }
-      });
-  };
+            case "auth/user-not-found":
+              setErrorMessage("User not found");
+              break;
+
+            default:
+              setErrorMessage(error.code);
+          }
+        });
+    },
+    [dispatch, navigation]
+  );
 
   return (
     <>
@@ -67,6 +73,7 @@ const SignInScreen = ({ navigation }: SignInScreenProps) => {
         buttonType="Sign In"
         signText="Do not have an account?"
         navigation={navigation}
+        hideErrorMessage={hideErrorMessage}
       />
     </>
   );

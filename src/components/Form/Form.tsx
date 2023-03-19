@@ -22,9 +22,16 @@ interface Props {
     RootStackParamList,
     keyof RootStackParamList
   >;
+  hideErrorMessage: () => void;
 }
 
-const Form: FC<Props> = ({ handleClick, buttonType, signText, navigation }) => {
+const Form: FC<Props> = ({
+  handleClick,
+  buttonType,
+  signText,
+  navigation,
+  hideErrorMessage,
+}) => {
   const color = useAppSelector((state) => state.mainReducer.color);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,7 +50,8 @@ const Form: FC<Props> = ({ handleClick, buttonType, signText, navigation }) => {
   const onPressButton = useCallback(() => {
     handleClick(email, password);
     Keyboard.dismiss();
-  }, [email, handleClick, password]);
+    hideErrorMessage();
+  }, [email, handleClick, hideErrorMessage, password]);
 
   const onPressSign = useCallback(() => {
     setEmail("");
@@ -52,7 +60,8 @@ const Form: FC<Props> = ({ handleClick, buttonType, signText, navigation }) => {
       ? navigation.navigate("SignUp")
       : navigation.navigate("SignIn");
     Keyboard.dismiss();
-  }, [isButtonType, navigation]);
+    hideErrorMessage();
+  }, [hideErrorMessage, isButtonType, navigation]);
 
   const [fontsLoaded] = useFonts({
     Montserrat_400Regular,

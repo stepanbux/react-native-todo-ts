@@ -16,10 +16,14 @@ import { useAppDispatch, useAppSelector } from "../../../store/redux-hooks";
 import { TouchableWithoutFeedback } from "react-native";
 import { setNewTodos } from "../../hooks/setNewTodos";
 import { styles } from "./Styles";
+import { TodoType } from "../../types/data";
 
 const AddTodo: React.FC = () => {
   const userId = useAppSelector((state) => state.mainReducer.id);
   const color = useAppSelector((state) => state.mainReducer.color);
+  const todos: Array<TodoType> = useAppSelector(
+    (state) => state.mainReducer.todos
+  );
   const dispatch = useAppDispatch();
   const [value, setValue] = useState("");
 
@@ -31,8 +35,15 @@ const AddTodo: React.FC = () => {
     return { ...styles.input, borderColor: color };
   }, [color]);
 
-  const pressButton = async () => {
-    if (value.trim()) {
+  const pressButton = useCallback(async () => {
+    if (
+      value.trim() &&
+      !(
+        todos.filter((item) => {
+          return item.title === value.trim();
+        }).length > 0
+      )
+    ) {
       const docRef = doc(db, "users", userId);
       await updateDoc(docRef, {
         todos: arrayUnion(value),
@@ -44,10 +55,10 @@ const AddTodo: React.FC = () => {
       }
       setValue("");
     } else {
-      Alert.alert("Name of business must not be empty");
+      Alert.alert("Name of business must not be empty or repeating");
     }
     Keyboard.dismiss();
-  };
+  }, [dispatch, todos, userId, value]);
 
   const [fontsLoaded] = useFonts({
     Montserrat_400Regular,

@@ -43,16 +43,19 @@ const SettingItem: FC<Props> = ({ title }) => {
     [color]
   );
 
-  const changeColor = (newColor: string) => async () => {
-    const docRef = doc(db, "users", userId);
-    await updateDoc(docRef, {
-      color: newColor,
-    });
-    const docTodo = await getDoc(docRef);
-    if (docTodo.exists()) {
-      dispatch(setColor(docTodo.data().color));
-    }
-  };
+  const changeColor = useCallback(
+    (newColor: string) => async () => {
+      const docRef = doc(db, "users", userId);
+      await updateDoc(docRef, {
+        color: newColor,
+      });
+      const docTodo = await getDoc(docRef);
+      if (docTodo.exists()) {
+        dispatch(setColor(docTodo.data().color));
+      }
+    },
+    [dispatch, userId]
+  );
 
   const toggleExpand = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);

@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 import { createSlice } from "@reduxjs/toolkit";
 
 const mainSlice = createSlice({

@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 import { configureStore } from "@reduxjs/toolkit";
 import mainReducer from "./slice";
 
